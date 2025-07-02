@@ -62,26 +62,31 @@ var dapodikDownloadCmd = &cobra.Command{
 		}
 
 		version := dapodik.GetCurrentVersion()
-		dapodik_path := path.Join(targetpath, fmt.Sprintf("%s.exe", version.Version))
-		dapodik_vokasi_path := path.Join(targetpath, fmt.Sprintf("%s_vokasi.exe", version.Version))
 
-		if err = utils.DownloadFile(version.Url, dapodik_path); err != nil {
-			panic(err)
-		}
+		if downloadType == "main" {
+			dapodik_path := path.Join(targetpath, fmt.Sprintf("%s.exe", version.Version))
+			dapodik_vokasi_path := path.Join(targetpath, fmt.Sprintf("%s_vokasi.exe", version.Version))
 
-		if err = utils.DownloadFile(version.VokasiUrl, dapodik_vokasi_path); err != nil {
-			panic(err)
-		}
-
-		for _, patch := range version.Patches {
-			vokasi_str := ""
-			if patch.IsVokasi {
-				vokasi_str = "_vokasi"
+			if err = utils.DownloadFile(version.Url, dapodik_path); err != nil {
+				panic(err)
 			}
 
-			patch_path := path.Join(targetpath, fmt.Sprintf("patch_%s%s.exe", patch.PatchName, vokasi_str))
-			if err = utils.DownloadFile(patch.PatchUrl, patch_path); err != nil {
+			if err = utils.DownloadFile(version.VokasiUrl, dapodik_vokasi_path); err != nil {
 				panic(err)
+			}
+		}
+
+		if downloadType == "patch" {
+			for _, patch := range version.Patches {
+				vokasi_str := ""
+				if patch.IsVokasi {
+					vokasi_str = "_vokasi"
+				}
+
+				patch_path := path.Join(targetpath, fmt.Sprintf("patch_%s%s.exe", patch.PatchName, vokasi_str))
+				if err = utils.DownloadFile(patch.PatchUrl, patch_path); err != nil {
+					panic(err)
+				}
 			}
 		}
 	},
